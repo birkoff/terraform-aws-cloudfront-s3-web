@@ -1,5 +1,5 @@
 locals {
-  aliases = [for item in var.frontend_subdomain_aliases : "${item}.${var.hosted_zone_name}"]
+  aliases = [for item in var.frontend_subdomain_aliases : lower("${item}.${var.hosted_zone_name}")]
 }
 
 resource "aws_cloudfront_origin_access_identity" "this" {
@@ -7,9 +7,10 @@ resource "aws_cloudfront_origin_access_identity" "this" {
 
 resource "aws_cloudfront_distribution" "this" {
   depends_on          = [aws_cloudfront_origin_access_identity.this, module.s3_frontend_files]
-  aliases             = local.aliases
+  aliases             = var.merge_hosted_zone_name ? concat(local.aliases, [var.hosted_zone_name]) : local.aliases
   comment             = var.comment
   default_root_object = "index.html"
+#  continuous_deployment_policy_id = aws_cloudfront_continuous_deployment_policy.this.id
 
   custom_error_response {
     error_caching_min_ttl = "10"

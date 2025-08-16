@@ -36,3 +36,7 @@ variable "logs_prefix" {
   type    = string
   default = ""
 }
+
+variable "merge_hosted_zone_name" {
+  default = false
+}
